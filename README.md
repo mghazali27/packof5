@@ -6,7 +6,9 @@
 
 ---
 
-### 🚀 [Live Demo](https://mghazali27.github.io/packof5/) 🚀
+<h3 align="center">
+  <a href="https://mghazali27.github.io/packof5/">🚀 LIVE DEMO 🚀</a>
+</h3>
 
 ---
 
