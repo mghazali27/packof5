@@ -4,12 +4,15 @@ import bwipjs from 'https://esm.sh/bwip-js@4.3.2';
 
 window.addEventListener('load', () => {
     let refDatabase = {};
+    const codeReader = new BrowserMultiFormatReader();
+    let selectedDeviceId;
 
     // --- DOM Elements ---
     const videoElement = document.getElementById('video');
     const resultElement = document.getElementById('result');
     const canvasElement = document.getElementById('barcode');
     const statusElement = document.getElementById('status');
+    const resetButton = document.getElementById('resetButton');
 
     function updateStatus(message) {
         console.log(message);
@@ -38,13 +41,12 @@ window.addEventListener('load', () => {
     // --- Barcode Scanning Logic ---
     function startScanner() {
         updateStatus("Searching for camera devices...");
-        const codeReader = new BrowserMultiFormatReader();
         codeReader.listVideoInputDevices()
             .then((videoInputDevices) => {
                 if (videoInputDevices.length > 0) {
                     updateStatus(`Found ${videoInputDevices.length} camera(s). Using the first one.`);
-                    const firstDeviceId = videoInputDevices[0].deviceId;
-                    decodeFromInput(codeReader, firstDeviceId);
+                    selectedDeviceId = videoInputDevices[0].deviceId;
+                    decodeFromInput(selectedDeviceId);
                 } else {
                     updateStatus("Error: No camera devices found.");
                 }
@@ -54,22 +56,34 @@ window.addEventListener('load', () => {
             });
     }
 
-    function decodeFromInput(codeReader, deviceId) {
+    function decodeFromInput(deviceId) {
         updateStatus("Starting video stream. Point camera at a code.");
+        videoElement.style.display = 'block'; // Show video
         codeReader.decodeFromVideoDevice(deviceId, videoElement, (result, err) => {
             if (result) {
                 codeReader.reset(); // Stop scanning
+                videoElement.style.display = 'none'; // Hide video
                 const scannedData = result.getText();
                 updateStatus("Code found!");
                 const processedData = processData(scannedData);
                 resultElement.innerHTML = `Original: ${scannedData}<br>Converted: ${processedData}`;
                 generateBarcode(processedData);
+                resetButton.classList.remove('hidden'); // Show the reset button
             }
             if (err && !(err instanceof NotFoundException)) {
                 updateStatus(`Decoding error: ${err.message}`);
             }
         });
     }
+
+    // --- Reset Logic ---
+    resetButton.addEventListener('click', () => {
+        resultElement.innerHTML = '';
+        const context = canvasElement.getContext('2d');
+        context.clearRect(0, 0, canvasElement.width, canvasElement.height);
+        resetButton.classList.add('hidden');
+        decodeFromInput(selectedDeviceId);
+    });
 
     // --- Core Data Processing Logic ---
     function processData(input) {

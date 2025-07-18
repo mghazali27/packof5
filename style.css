@@ -47,3 +47,14 @@ video {
     max-width: 640px;
     word-wrap: break-word;
 }
+
+#resetButton {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 1em;
+    cursor: pointer;
+}
+
+.hidden {
+    display: none;
+}
