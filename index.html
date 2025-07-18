@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Datamatrix Converter</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Datamatrix Converter</h1>
+    <div id="interactive" class="viewport">
+        <video id="video" playsinline autoplay></video>
+    </div>
+    <div id="result"></div>
+    <canvas id="barcode"></canvas>
+
+    <script src="https://cdn.jsdelivr.net/npm/@zxing/library@latest"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bwip-js@3/dist/bwip-js-min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
