@@ -38,6 +38,9 @@ window.addEventListener('load', () => {
         installButton.disabled = false;
         installButton.textContent = 'Install App';
         updateStatus("App is ready to install. Click the install button.");
+        
+        // Log for debugging
+        console.log('Install prompt captured and ready to use');
     });
 
     // Check if app is installable (for browsers that don't support beforeinstallprompt)
