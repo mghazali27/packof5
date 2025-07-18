@@ -35,3 +35,15 @@ video {
 #barcode {
     margin-top: 20px;
 }
+
+.status-box {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-top: 15px;
+    text-align: center;
+    font-family: monospace;
+    width: 80vw;
+    max-width: 640px;
+    word-wrap: break-word;
+}

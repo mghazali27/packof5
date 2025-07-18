@@ -6,6 +6,14 @@ window.addEventListener('load', () => {
     const videoElement = document.getElementById('video');
     const resultElement = document.getElementById('result');
     const canvasElement = document.getElementById('barcode');
+    const statusElement = document.getElementById('status');
+
+    function updateStatus(message) {
+        console.log(message);
+        statusElement.textContent = message;
+    }
+
+    updateStatus("Page loaded. Fetching database...");
 
     // --- Load Database ---
     fetch('database.json')
@@ -17,53 +25,51 @@ window.addEventListener('load', () => {
         })
         .then(data => {
             refDatabase = data;
-            console.log("Database loaded successfully.");
-            // Start the camera only after the database is loaded
+            updateStatus("Database loaded. Initializing camera...");
             startScanner();
         })
         .catch(e => {
-            console.error("Error loading database:", e);
-            resultElement.textContent = "Error: Could not load the reference database.";
+            updateStatus(`Error: Could not load database. ${e.message}`);
         });
 
     // --- Barcode Scanning Logic ---
     function startScanner() {
+        updateStatus("Searching for camera devices...");
         codeReader.listVideoInputDevices()
             .then((videoInputDevices) => {
                 if (videoInputDevices.length > 0) {
+                    updateStatus(`Found ${videoInputDevices.length} camera(s). Using the first one.`);
                     const firstDeviceId = videoInputDevices[0].deviceId;
                     decodeFromInput(firstDeviceId);
                 } else {
-                    console.error("No video input devices found.");
-                    resultElement.textContent = "Error: No camera found.";
+                    updateStatus("Error: No camera devices found.");
                 }
             })
             .catch((err) => {
-                console.error(err);
-                resultElement.textContent = `Error: ${err}`;
+                updateStatus(`Error listing video devices: ${err.message}`);
             });
     }
 
     function decodeFromInput(deviceId) {
+        updateStatus("Starting video stream. Point camera at a code.");
         codeReader.decodeFromVideoDevice(deviceId, videoElement, (result, err) => {
             if (result) {
                 codeReader.reset(); // Stop scanning
                 const scannedData = result.getText();
-                console.log(`Scanned data: ${scannedData}`);
+                updateStatus("Code found!");
                 const processedData = processData(scannedData);
                 resultElement.innerHTML = `Original: ${scannedData}<br>Converted: ${processedData}`;
                 generateBarcode(processedData);
             }
             if (err && !(err instanceof ZXing.NotFoundException)) {
-                console.error(err);
-                resultElement.textContent = `Error: ${err}`;
+                updateStatus(`Decoding error: ${err.message}`);
             }
         });
     }
 
     // --- Core Data Processing Logic ---
     function processData(input) {
-        // 1. Find matching reference
+        // ... (logic is unchanged)
         let foundRef = null;
         let multiplier = null;
         for (const ref in refDatabase) {
@@ -78,39 +84,31 @@ window.addEventListener('load', () => {
             return "Reference not found in database.";
         }
 
-        // 2. Extract quantity from fixed position (char 20-23)
         const quantityStr = input.substring(19, 23);
         const quantity = parseInt(quantityStr, 10);
-
-        // 3. Calculate new quantity
         const newQuantity = quantity * multiplier;
-
-        // 4. Format new quantity to 4 digits
         const newQuantityStr = String(newQuantity).padStart(4, '0');
-
-        // 5. Reconstruct output string
         const prefix = input.substring(0, 19);
         const suffix = input.substring(23);
         const output = `${prefix}${newQuantityStr}${suffix}`;
-
         return output;
     }
 
     // --- Barcode Generation Logic ---
     function generateBarcode(data) {
+        // ... (logic is unchanged)
         if (data && !data.includes("not found")) {
             try {
                 bwipjs.toCanvas(canvasElement, {
-                    bcid: 'datamatrix',       // Barcode type
-                    text: data,               // Text to encode
-                    scale: 3,                 // 3x scaling factor
-                    height: 10,               // Bar height, in millimeters
-                    includetext: true,        // Show human-readable text
-                    textxalign: 'center',     // Always good to set this
+                    bcid: 'datamatrix',
+                    text: data,
+                    scale: 3,
+                    height: 10,
+                    includetext: true,
+                    textxalign: 'center',
                 });
             } catch (e) {
-                console.error(e);
-                resultElement.textContent = `Error generating barcode: ${e}`;
+                updateStatus(`Error generating barcode: ${e.message}`);
             }
         }
     }
