@@ -5,7 +5,7 @@ import bwipjs from 'https://esm.sh/bwip-js@4.3.2';
 window.addEventListener('load', () => {
     // --- Register Service Worker ---
     if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('/sw.js')
+        navigator.serviceWorker.register('sw.js')
             .then(registration => {
                 console.log('Service Worker registered with scope:', registration.scope);
             })
