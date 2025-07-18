@@ -44,9 +44,20 @@ window.addEventListener('load', () => {
         codeReader.listVideoInputDevices()
             .then((videoInputDevices) => {
                 if (videoInputDevices.length > 0) {
-                    updateStatus(`Found ${videoInputDevices.length} camera(s). Using the first one.`);
-                    selectedDeviceId = videoInputDevices[0].deviceId;
+                    // Prefer the rear camera
+                    let rearCamera = videoInputDevices.find(device => device.label.toLowerCase().includes('back') || device.label.toLowerCase().includes('rear'));
+                    
+                    if (rearCamera) {
+                        selectedDeviceId = rearCamera.deviceId;
+                        updateStatus(`Using rear camera: ${rearCamera.label}`);
+                    } else {
+                        // As a fallback, use the last camera in the list, which is often the rear one.
+                        selectedDeviceId = videoInputDevices[videoInputDevices.length - 1].deviceId;
+                        updateStatus(`Rear camera not explicitly found. Using last camera in list.`);
+                    }
+                    
                     decodeFromInput(selectedDeviceId);
+
                 } else {
                     updateStatus("Error: No camera devices found.");
                 }
