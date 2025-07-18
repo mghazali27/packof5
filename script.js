@@ -1,8 +1,11 @@
+// Import libraries directly as ES Modules. This is more reliable.
+import { BrowserMultiFormatReader, NotFoundException } from 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.0/esm/index.js';
+import bwipjs from 'https://cdn.jsdelivr.net/npm/bwip-js@4.3.2/dist/bwip-js.mjs';
+
 window.addEventListener('load', () => {
     let refDatabase = {};
 
     // --- DOM Elements ---
-    const codeReader = new ZXing.BrowserMultiFormatReader();
     const videoElement = document.getElementById('video');
     const resultElement = document.getElementById('result');
     const canvasElement = document.getElementById('barcode');
@@ -35,12 +38,13 @@ window.addEventListener('load', () => {
     // --- Barcode Scanning Logic ---
     function startScanner() {
         updateStatus("Searching for camera devices...");
+        const codeReader = new BrowserMultiFormatReader();
         codeReader.listVideoInputDevices()
             .then((videoInputDevices) => {
                 if (videoInputDevices.length > 0) {
                     updateStatus(`Found ${videoInputDevices.length} camera(s). Using the first one.`);
                     const firstDeviceId = videoInputDevices[0].deviceId;
-                    decodeFromInput(firstDeviceId);
+                    decodeFromInput(codeReader, firstDeviceId);
                 } else {
                     updateStatus("Error: No camera devices found.");
                 }
@@ -50,7 +54,7 @@ window.addEventListener('load', () => {
             });
     }
 
-    function decodeFromInput(deviceId) {
+    function decodeFromInput(codeReader, deviceId) {
         updateStatus("Starting video stream. Point camera at a code.");
         codeReader.decodeFromVideoDevice(deviceId, videoElement, (result, err) => {
             if (result) {
@@ -61,7 +65,7 @@ window.addEventListener('load', () => {
                 resultElement.innerHTML = `Original: ${scannedData}<br>Converted: ${processedData}`;
                 generateBarcode(processedData);
             }
-            if (err && !(err instanceof ZXing.NotFoundException)) {
+            if (err && !(err instanceof NotFoundException)) {
                 updateStatus(`Decoding error: ${err.message}`);
             }
         });
@@ -69,7 +73,6 @@ window.addEventListener('load', () => {
 
     // --- Core Data Processing Logic ---
     function processData(input) {
-        // ... (logic is unchanged)
         let foundRef = null;
         let multiplier = null;
         for (const ref in refDatabase) {
@@ -96,7 +99,6 @@ window.addEventListener('load', () => {
 
     // --- Barcode Generation Logic ---
     function generateBarcode(data) {
-        // ... (logic is unchanged)
         if (data && !data.includes("not found")) {
             try {
                 bwipjs.toCanvas(canvasElement, {
