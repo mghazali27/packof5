@@ -17,9 +17,15 @@ window.addEventListener('load', () => {
     const installButton = document.getElementById('installButton');
 
     // --- PWA Install Logic ---
+    let isInstallable = false;
+    
     // Hide the button if the app is already installed
     if (window.matchMedia('(display-mode: standalone)').matches) {
         installButton.classList.add('hidden');
+    } else {
+        // Always show install button when not in standalone mode
+        installButton.classList.remove('hidden');
+        installButton.disabled = true; // Initially disabled until we check installability
     }
 
     window.addEventListener('beforeinstallprompt', (e) => {
@@ -27,26 +33,76 @@ window.addEventListener('load', () => {
         e.preventDefault();
         // Stash the event so it can be triggered later.
         deferredPrompt = e;
-        // Enable the install button, now that we know it's possible
+        isInstallable = true;
+        // Enable the install button when prompt is available
         installButton.disabled = false;
-        updateStatus("Ready to install.");
+        installButton.textContent = 'Install App';
+        updateStatus("App is ready to install. Click the install button.");
+    });
+
+    // Check if app is installable (for browsers that don't support beforeinstallprompt)
+    window.addEventListener('load', () => {
+        if (!window.matchMedia('(display-mode: standalone)').matches) {
+            // Check if PWA criteria are met
+            if ('serviceWorker' in navigator && 'BeforeInstallPromptEvent' in window) {
+                // Modern browser with PWA support
+                setTimeout(() => {
+                    if (!isInstallable) {
+                        installButton.disabled = false;
+                        installButton.textContent = 'Install Guide';
+                        updateStatus("Install prompt not available. Use browser menu to install.");
+                    }
+                }, 2000);
+            } else {
+                // Fallback for older browsers
+                installButton.disabled = false;
+                installButton.textContent = 'Install Guide';
+                updateStatus("Use browser menu to install this app.");
+            }
+        }
     });
 
     installButton.addEventListener('click', async () => {
-        if (!deferredPrompt) {
-            // The prompt is not available.
-            return;
+        if (deferredPrompt) {
+            // Show the install prompt
+            deferredPrompt.prompt();
+            // Wait for the user to respond to the prompt
+            const { outcome } = await deferredPrompt.userChoice;
+            console.log(`User response to the install prompt: ${outcome}`);
+            // We've used the prompt, and can't use it again, throw it away
+            deferredPrompt = null;
+            // Hide the button after the prompt is used.
+            installButton.classList.add('hidden');
+        } else {
+            // Fallback: Show installation instructions
+            showInstallInstructions();
         }
-        // Show the install prompt
-        deferredPrompt.prompt();
-        // Wait for the user to respond to the prompt
-        const { outcome } = await deferredPrompt.userChoice;
-        console.log(`User response to the install prompt: ${outcome}`);
-        // We've used the prompt, and can't use it again, throw it away
-        deferredPrompt = null;
-        // Hide the button after the prompt is used.
-        installButton.classList.add('hidden');
     });
+
+    function showInstallInstructions() {
+        const instructions = `
+            <div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+                        background: rgba(0,0,0,0.8); z-index: 1000; display: flex; 
+                        align-items: center; justify-content: center;">
+                <div style="background: white; padding: 20px; border-radius: 10px; 
+                            max-width: 400px; margin: 20px; text-align: center;">
+                    <h3>Install This App</h3>
+                    <p>To install this app on your device:</p>
+                    <ul style="text-align: left; margin: 15px 0;">
+                        <li><strong>Chrome/Edge:</strong> Tap the ⋮ menu → "Install app" or "Add to Home Screen"</li>
+                        <li><strong>Safari (iOS):</strong> Tap the share icon → "Add to Home Screen"</li>
+                        <li><strong>Firefox:</strong> Tap the ⋮ menu → "Install"</li>
+                    </ul>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="padding: 10px 20px; background: #007bff; color: white; 
+                                   border: none; border-radius: 5px; cursor: pointer;">
+                        Got it!
+                    </button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', instructions);
+    }
 
     // --- Register Service Worker ---
     if ('serviceWorker' in navigator) {

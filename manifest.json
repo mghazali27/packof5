@@ -4,18 +4,25 @@
   "start_url": ".",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#000000",
+  "theme_color": "#007bff",
   "description": "A simple application to scan and convert datamatrix codes.",
   "icons": [
     {
       "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "categories": ["productivity", "utilities"],
+  "lang": "en",
+  "orientation": "portrait",
+  "scope": ".",
+  "prefer_related_applications": false
 }

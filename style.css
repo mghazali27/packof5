@@ -50,14 +50,39 @@ video {
 
 #installButton, #resetButton {
     margin-top: 20px;
-    padding: 10px 20px;
+    padding: 12px 24px;
     font-size: 1em;
     cursor: pointer;
+    border: none;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+}
+
+#installButton {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+}
+
+#installButton:hover:not(:disabled) {
+    background-color: #0056b3;
+    transform: translateY(-1px);
 }
 
 #installButton:disabled {
-    background-color: #ccc;
+    background-color: #6c757d;
     cursor: not-allowed;
+    opacity: 0.7;
+}
+
+#resetButton {
+    background-color: #28a745;
+    color: white;
+}
+
+#resetButton:hover {
+    background-color: #1e7e34;
+    transform: translateY(-1px);
 }
 
 .hidden {
