@@ -1,6 +1,6 @@
-// Import libraries directly as ES Modules. This is more reliable.
-import { BrowserMultiFormatReader, NotFoundException } from 'https://cdn.jsdelivr.net/npm/@zxing/library@0.21.0/esm/index.js';
-import bwipjs from 'https://cdn.jsdelivr.net/npm/bwip-js@4.3.2/dist/bwip-js.mjs';
+// Import libraries from esm.sh, which provides pre-bundled modules for browsers.
+import { BrowserMultiFormatReader, NotFoundException } from 'https://esm.sh/@zxing/library@0.21.0';
+import bwipjs from 'https://esm.sh/bwip-js@4.3.2';
 
 window.addEventListener('load', () => {
     let refDatabase = {};
