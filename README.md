@@ -11,27 +11,27 @@ This project is a **Progressive Web App (PWA)**, which means you can "install" i
 ```mermaid
 graph TD
     subgraph "First Time Use"
-        A[📱 Open App URL] --> B{PWA Features Load};
-        B --> C[🌐 App Caches for Offline Use];
-        B --> D[⭐ Browser offers "Install App" / "Add to Home Screen"];
+        A[📱 Open App URL] --> B{PWA Features Load}
+        B --> C[🌐 App Caches for Offline Use]
+        B --> D[⭐ Browser offers Install App / Add to Home Screen]
     end
 
     subgraph "Core Logic"
-        E[📷 Scan Datamatrix] --> F{Decode Data};
-        F --> G[⚙️ Process Data];
-        G --> H{Find Ref in `database.json`};
-        H --> I[Extract Quantity (pos 20-23)];
-        I --> J[Calculate New Quantity];
-        J --> K[Reconstruct String];
-        K --> L[📊 Display Results];
-        L --> M[🔳 Generate New Datamatrix];
-        M --> N[🔄 Click "Scan Next" to restart];
-        N --> E;
+        E[📷 Scan Datamatrix] --> F{Decode Data}
+        F --> G[⚙️ Process Data]
+        G --> H{Find Ref in database.json}
+        H --> I[Extract Quantity \- pos 20 to 23]
+        I --> J[Calculate New Quantity]
+        J --> K[Reconstruct String]
+        K --> L[📊 Display Results]
+        L --> M[🔳 Generate New Datamatrix]
+        M --> N[🔄 Click Scan Next to restart]
+        N --> E
     end
 
-    D --> O(🏠 App installed on Home Screen);
-    O --> E;
-    A --> E;
+    D --> O[🏠 App installed on Home Screen]
+    O --> E
+    A --> E
 ```
 
 ## 🛠️ Technologies Used
