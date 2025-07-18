@@ -48,7 +48,7 @@ video {
     word-wrap: break-word;
 }
 
-#resetButton {
+#installButton, #resetButton {
     margin-top: 20px;
     padding: 10px 20px;
     font-size: 1em;

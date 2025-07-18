@@ -3,6 +3,42 @@ import { BrowserMultiFormatReader, NotFoundException } from 'https://esm.sh/@zxi
 import bwipjs from 'https://esm.sh/bwip-js@4.3.2';
 
 window.addEventListener('load', () => {
+    let refDatabase = {};
+    const codeReader = new BrowserMultiFormatReader();
+    let selectedDeviceId;
+    let deferredPrompt; // This will hold the install prompt event
+
+    // --- DOM Elements ---
+    const videoElement = document.getElementById('video');
+    const resultElement = document.getElementById('result');
+    const canvasElement = document.getElementById('barcode');
+    const statusElement = document.getElementById('status');
+    const resetButton = document.getElementById('resetButton');
+    const installButton = document.getElementById('installButton');
+
+    // --- PWA Install Logic ---
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevent the mini-infobar from appearing on mobile
+        e.preventDefault();
+        // Stash the event so it can be triggered later.
+        deferredPrompt = e;
+        // Update UI to notify the user they can install the PWA
+        installButton.classList.remove('hidden');
+        updateStatus("Ready to install.");
+    });
+
+    installButton.addEventListener('click', async () => {
+        // Hide the app provided install promotion
+        installButton.classList.add('hidden');
+        // Show the install prompt
+        deferredPrompt.prompt();
+        // Wait for the user to respond to the prompt
+        const { outcome } = await deferredPrompt.userChoice;
+        console.log(`User response to the install prompt: ${outcome}`);
+        // We've used the prompt, and can't use it again, throw it away
+        deferredPrompt = null;
+    });
+
     // --- Register Service Worker ---
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('sw.js')
@@ -13,17 +49,6 @@ window.addEventListener('load', () => {
                 console.error('Service Worker registration failed:', error);
             });
     }
-
-    let refDatabase = {};
-    const codeReader = new BrowserMultiFormatReader();
-    let selectedDeviceId;
-
-    // --- DOM Elements ---
-    const videoElement = document.getElementById('video');
-    const resultElement = document.getElementById('result');
-    const canvasElement = document.getElementById('barcode');
-    const statusElement = document.getElementById('status');
-    const resetButton = document.getElementById('resetButton');
 
     function updateStatus(message) {
         console.log(message);
