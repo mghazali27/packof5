@@ -55,6 +55,11 @@ video {
     cursor: pointer;
 }
 
+#installButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
 .hidden {
     display: none;
 }

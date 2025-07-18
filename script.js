@@ -17,19 +17,26 @@ window.addEventListener('load', () => {
     const installButton = document.getElementById('installButton');
 
     // --- PWA Install Logic ---
+    // Hide the button if the app is already installed
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+        installButton.classList.add('hidden');
+    }
+
     window.addEventListener('beforeinstallprompt', (e) => {
         // Prevent the mini-infobar from appearing on mobile
         e.preventDefault();
         // Stash the event so it can be triggered later.
         deferredPrompt = e;
-        // Update UI to notify the user they can install the PWA
-        installButton.classList.remove('hidden');
+        // Enable the install button, now that we know it's possible
+        installButton.disabled = false;
         updateStatus("Ready to install.");
     });
 
     installButton.addEventListener('click', async () => {
-        // Hide the app provided install promotion
-        installButton.classList.add('hidden');
+        if (!deferredPrompt) {
+            // The prompt is not available.
+            return;
+        }
         // Show the install prompt
         deferredPrompt.prompt();
         // Wait for the user to respond to the prompt
@@ -37,6 +44,8 @@ window.addEventListener('load', () => {
         console.log(`User response to the install prompt: ${outcome}`);
         // We've used the prompt, and can't use it again, throw it away
         deferredPrompt = null;
+        // Hide the button after the prompt is used.
+        installButton.classList.add('hidden');
     });
 
     // --- Register Service Worker ---
