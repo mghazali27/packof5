@@ -1,6 +1,14 @@
 # 🏭 Datamatrix Converter Web App 🔧
 
-<img src="icon-192.png" alt="App Icon" width="96"/>
+<p align="center">
+  <img src="icon-192.png" alt="App Icon" width="96"/>
+</p>
+
+---
+
+### 🚀 [Live Demo](https://mghazali27.github.io/packof5/) 🚀
+
+---
 
 This web application converts industrial datamatrix codes based on a predefined logic. It uses the device's camera to scan a datamatrix, processes the data, and generates a new datamatrix with the converted data.
 
